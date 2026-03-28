@@ -1,0 +1,6 @@
+room_number,rows,columns,capacity,allowed_branches
+A101,4,3,12,"CS,ME,EE"
+A102,4,3,12,"ME,CS,EE,EC"
+A103,3,2,6,"CS,ME,EE,EC"
+A104,2,3,6,"EC,EE"
+A105,2,2,4,"EE,EC"

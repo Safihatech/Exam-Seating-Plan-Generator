@@ -1,0 +1,5 @@
+/* login.css - Extends common style.css theme */
+body.login-page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+/* Add only login-specific overrides below */

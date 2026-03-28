@@ -1,0 +1,23 @@
+/* Custom styles for admin.html */
+
+/* Common theme variables */
+:root {
+	--admin-progress-height: 20px;
+	--admin-td-max-width: 300px;
+}
+
+.truncate-td {
+	max-width: var(--admin-td-max-width);
+}
+.progress-20 {
+	height: var(--admin-progress-height);
+}
+.progress-bar-85 {
+	width: 85%;
+}
+.progress-bar-92 {
+	width: 92%;
+}
+.progress-bar-45 {
+	width: 45%;
+}

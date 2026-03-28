@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate Seating Plan - Exam Seating Plan Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/generate plan/generate_plan.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-chair"></i> Exam Seating Plan Generator
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ url_for('generate_plan') }}">
+                            <i class="fas fa-plus"></i> Generate Plan
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('pdf_history')}}">
+                            <i class="fas fa-history"></i> History
+                        </a>
+                    </li>
+                     
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{ session.full_name }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('settings') }}">
+                                <i class="fas fa-cog"></i> Settings
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0" style="color: white;">
+                            <i class="fas fa-clipboard-list"></i> Generate Seating Plan
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data" id="seatingForm">
+                            <!-- File Upload Section -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <div class="display-6 text-primary mb-3">
+                                                <i class="fas fa-users"></i>
+                                            </div>
+                                            <h5>Student Data</h5>
+                                            <div class="mb-3">
+                                                <label for="student_csv" class="form-label">Upload Student CSV File</label>
+                                                <input type="file" class="form-control" id="student_csv" name="student_csv" accept=".csv" required>
+                                                <div class="form-text">
+                                                    CSV should contain: Roll Number, Name, Branch, Section
+                                                </div>
+                                            </div>
+                                            <a href="/static/sample_students.csv" class="btn btn-outline-primary btn-sm">
+                                                <i class="fas fa-download"></i> Download Sample
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <div class="display-6 text-success mb-3">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+                                            <h5>Room Layout</h5>
+                                            <div class="mb-3">
+                                                <label for="room_csv" class="form-label">Upload Room CSV File</label>
+                                                <input type="file" class="form-control" id="room_csv" name="room_csv" accept=".csv" required>
+                                                <div class="form-text">
+                                                    CSV should contain: Room Number, Rows, Columns, Allowed Branches
+                                                </div>
+                                            </div>
+                                            <a href="/static/sample_rooms.csv" class="btn btn-outline-success btn-sm">
+                                                <i class="fas fa-download"></i> Download Sample
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Configuration Section -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-sliders-h"></i> Configuration Options
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="students_per_desk" class="form-label">
+                                                    <i class="fas fa-chair"></i> Students per Desk
+                                                </label>
+                                                <select class="form-select" id="students_per_desk" name="students_per_desk">
+                                                    <option value="1" {% if default_settings.students_per_desk == 1 %}selected{% endif %}>1 Student</option>
+                                                    <option value="2" {% if default_settings.students_per_desk == 2 %}selected{% endif %}>2 Students</option>
+                                                    <option value="3" {% if default_settings.students_per_desk == 3 %}selected{% endif %}>3 Students</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="building" class="form-label">
+                                                    <i class="fas fa-building"></i> Building/Block
+                                                </label>
+                                                <input type="text" class="form-control" id="building" name="building" 
+                                                       value="{{ default_settings.default_building or 'Main Building' }}" 
+                                                       placeholder="Enter building name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label class="form-label">
+                                                    <i class="fas fa-user-clock"></i> Special Options
+                                                </label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="include_detained" name="include_detained" 
+                                                           {% if default_settings.include_detained %}checked{% endif %}>
+                                                    <label class="form-check-label" for="include_detained">
+                                                        Include Detained Students
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="mb-3">
+                                                <label for="fill_order" class="form-label">
+                                                    <i class="fas fa-th-large"></i> Fill Order
+                                                </label>
+                                                <select class="form-select" id="fill_order" name="fill_order">
+                                                    <option value="row" selected>Row-wise (default)</option>
+                                                    <option value="column">Column-wise</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Constraints Information -->
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> Seating Constraints</h6>
+                                <ul class="mb-0 small">
+                                    <li>Students from the same branch will not be seated side-by-side (left-right)</li>
+                                    <li>Students from the same branch will not be seated one behind another (front-back)</li>
+                                    <li>Constraints are enforced globally across all rooms</li>
+                                    <li>Students are grouped by branch and section for optimal arrangement</li>
+                                </ul>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                                    <i class="fas fa-magic"></i> Generate Seating Plan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Recent Plans -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-clock"></i> Quick Access
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <a href="{{ url_for('pdf_history') }}" class="btn btn-outline-primary btn-block mb-2">
+                                    <i class="fas fa-history"></i><br>
+                                    <small>View History</small>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ url_for('settings') }}" class="btn btn-outline-info btn-block mb-2">
+                                    <i class="fas fa-cog"></i><br>
+                                    <small>Settings</small>
+                                </a>
+                            </div>
+                            <div class="col-md-4">
+                                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-block mb-2">
+                                    <i class="fas fa-tachometer-alt"></i><br>
+                                    <small>Dashboard</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Form validation and enhancement
+        document.getElementById('seatingForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('generateBtn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+            submitBtn.disabled = true;
+        });
+
+        // File input validation
+        document.getElementById('student_csv').addEventListener('change', function(e) {
+            validateCSVFile(e.target, 'students');
+        });
+
+        document.getElementById('room_csv').addEventListener('change', function(e) {
+            validateCSVFile(e.target, 'rooms');
+        });
+
+        function validateCSVFile(input, type) {
+            const file = input.files[0];
+            if (file) {
+                if (!file.name.toLowerCase().endsWith('.csv')) {
+                    alert('Please select a CSV file.');
+                    input.value = '';
+                    return;
+                }
+                
+                // You could add more validation here, like file size checks
+                if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                    alert('File size should not exceed 5MB.');
+                    input.value = '';
+                    return;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

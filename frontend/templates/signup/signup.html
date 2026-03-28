@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up - Exam Seating Plan Generator</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/signup/signup.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .signup-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 600px;
+        margin: auto;
+      }
+
+      .brand-logo {
+        font-size: rem;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .password-strength-container {
+        width: 100%;
+        height: 5px;
+        background-color: #e9ecef;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+
+      .password-strength {
+        height: 100%;
+        border-radius: 3px;
+        transition: all 0.3s ease;
+        width: 0%;
+        opacity: 0;
+      }
+
+      /* Responsive Adjustments */
+      @media (max-width: 768px) {
+        .signup-card {
+          max-width: 90%;
+          padding: 15px;
+        }
+        .signup-card h1 {
+          font-size: 1.4rem;
+        }
+        .signup-card h2 {
+          font-size: 1.1rem;
+        }
+      }
+
+      @media (max-width: 576px) {
+        .signup-card {
+          max-width: 95%;
+          padding: 12px;
+          border-radius: 10px;
+        }
+        .signup-card h1 {
+          font-size: 1.2rem;
+        }
+        .signup-card h2 {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+          <!-- Main Card -->
+          <div class="card signup-card p-4">
+            <!-- Brand Logo Section -->
+            <div class="brand-logo text-center py-3">
+              <i
+                class="fas fa-university fa-3x mb-2"
+                style="color: #667eea"
+              ></i>
+              <h1
+                class="h4 fw-bold mb-1"
+                style="
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  -webkit-background-clip: text;
+                  -webkit-text-fill-color: transparent;
+                  background-clip: text;
+                "
+              >
+                Exam Seating Plan Generator
+              </h1>
+              <p class="text-muted mb-0 small">
+                Create your account to get started
+              </p>
+            </div>
+
+            <div class="card-body px-3">
+              <div class="text-center mb-3">
+                <h2 class="h5 fw-bold text-dark mb-1">Create Account</h2>
+                <p class="text-muted small mb-0">
+                  Fill in your details to get started
+                </p>
+              </div>
+
+              <!-- Flash Messages -->
+              {% with messages = get_flashed_messages() %} {% if messages %} {%
+              for message in messages %}
+              <div
+                class="alert alert-danger alert-dismissible fade show"
+                role="alert"
+              >
+                <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                ></button>
+              </div>
+              {% endfor %} {% endif %} {% endwith %}
+
+              <form method="POST" id="signupForm">
+                <div class="row g-3">
+                  <!-- Full Name -->
+                  <div class="col-md-6">
+                    <label for="full_name" class="form-label fw-semibold small">
+                      <i class="fas fa-user me-1 text-primary"></i>Full Name
+                      <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control form-control-lg"
+                      id="full_name"
+                      name="full_name"
+                      placeholder="Enter your full name"
+                      required
+                    />
+                  </div>
+
+                  <!-- Username -->
+                  <div class="col-md-6">
+                    <label for="username" class="form-label fw-semibold small">
+                      <i class="fas fa-at me-1 text-primary"></i>Username
+                      <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      class="form-control form-control-lg"
+                      id="username"
+                      name="username"
+                      placeholder="Choose a username"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <!-- Email -->
+                  <div class="col-md-6">
+                    <label for="email" class="form-label fw-semibold small">
+                      <i class="fas fa-envelope me-1 text-primary"></i>Email
+                      Address <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      class="form-control form-control-lg"
+                      id="email"
+                      name="email"
+                      placeholder="Enter your email address"
+                      required
+                    />
+                  </div>
+
+                  <!-- Role Selection -->
+                  <div class="col-md-6">
+                    <label for="role" class="form-label fw-semibold small">
+                      <i class="fas fa-user-tag me-1 text-primary"></i>Role
+                      <span class="text-danger">*</span>
+                    </label>
+                    <select
+                      class="form-select form-select-lg"
+                      id="role"
+                      name="role"
+                      required
+                    >
+                      <option value="admin" selected>Administrator</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <!-- Password -->
+                  <div class="col-md-6">
+                    <label for="password" class="form-label fw-semibold small">
+                      <i class="fas fa-lock me-1 text-primary"></i>Password
+                      <span class="text-danger">*</span>
+                    </label>
+                    <div class="input-group input-group-lg">
+                      <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        placeholder="Create password"
+                        required
+                      />
+                      <button
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        id="togglePassword"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Confirm Password -->
+                  <div class="col-md-6">
+                    <label
+                      for="confirm_password"
+                      class="form-label fw-semibold small"
+                    >
+                      <i class="fas fa-lock me-1 text-primary"></i>Confirm
+                      Password <span class="text-danger">*</span>
+                    </label>
+                    <input
+                      type="password"
+                      class="form-control form-control-lg"
+                      id="confirm_password"
+                      name="confirm_password"
+                      placeholder="Confirm password"
+                      required
+                    />
+                    <div
+                      class="invalid-feedback"
+                      id="passwordMismatch"
+                      style="display: none"
+                    >
+                      Passwords do not match
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Password Requirements -->
+                <div class="mb-3">
+                  <div class="password-strength-container mb-2">
+                    <div class="password-strength" id="passwordStrength"></div>
+                  </div>
+                  <small class="text-muted">
+                    Password must be at least 8 characters with uppercase,
+                    lowercase, number, and special character
+                  </small>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="mb-4">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="terms"
+                      name="terms"
+                      required
+                    />
+                    <label class="form-check-label small" for="terms">
+                      I agree to the
+                      <a href="#" style="color: #667eea; text-decoration: none"
+                        >Terms of Service</a
+                      >
+                      and
+                      <a href="#" style="color: #667eea; text-decoration: none"
+                        >Privacy Policy</a
+                      >
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button
+                  type="submit"
+                  class="btn btn-lg w-100 mb-3 py-3"
+                  style="
+                    background: linear-gradient(
+                      135deg,
+                      #667eea 0%,
+                      #764ba2 100%
+                    );
+                    border: none;
+                    color: white;
+                    font-weight: 600;
+                    border-radius: 8px;
+                  "
+                >
+                  <i class="fas fa-user-plus me-2"></i>Create Account
+                </button>
+
+                <!-- Login Link -->
+                <div class="text-center">
+                  <p class="mb-0">
+                    Already have an account?
+                    <a
+                      href="{{ url_for('login') }}"
+                      class="fw-semibold text-decoration-none"
+                      style="
+                        background: linear-gradient(
+                          135deg,
+                          #667eea 0%,
+                          #764ba2 100%
+                        );
+                        -webkit-background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        background-clip: text;
+                      "
+                      >Sign In</a
+                    >
+                  </p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Password visibility toggle
+      document
+        .getElementById("togglePassword")
+        .addEventListener("click", function () {
+          const password = document.getElementById("password");
+          const icon = this.querySelector("i");
+
+          if (password.type === "password") {
+            password.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+          } else {
+            password.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+          }
+        });
+
+      // Password strength indicator
+      document
+        .getElementById("password")
+        .addEventListener("input", function () {
+          const password = this.value;
+          const strengthBar = document.getElementById("passwordStrength");
+          let strength = 0;
+
+          if (password.length >= 8) strength++;
+          if (/[a-z]/.test(password)) strength++;
+          if (/[A-Z]/.test(password)) strength++;
+          if (/[0-9]/.test(password)) strength++;
+          if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+          const colors = [
+            "#dc3545",
+            "#fd7e14",
+            "#ffc107",
+            "#198754",
+            "#0d6efd",
+          ];
+          const widths = ["20%", "40%", "60%", "80%", "100%"];
+
+          if (password.length > 0) {
+            strengthBar.style.width = widths[strength - 1] || "20%";
+            strengthBar.style.backgroundColor =
+              colors[strength - 1] || "#dc3545";
+            strengthBar.style.opacity = "1";
+          } else {
+            strengthBar.style.width = "0%";
+            strengthBar.style.opacity = "0";
+          }
+        });
+
+      // Confirm password validation
+      document
+        .getElementById("confirm_password")
+        .addEventListener("input", function () {
+          const password = document.getElementById("password").value;
+          const confirmPassword = this.value;
+          const mismatchDiv = document.getElementById("passwordMismatch");
+
+          if (confirmPassword && password !== confirmPassword) {
+            this.classList.add("is-invalid");
+            mismatchDiv.style.display = "block";
+          } else {
+            this.classList.remove("is-invalid");
+            mismatchDiv.style.display = "none";
+          }
+        });
+
+      // Form validation
+      document
+        .getElementById("signupForm")
+        .addEventListener("submit", function (e) {
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirm_password").value;
+
+          if (password !== confirmPassword) {
+            e.preventDefault();
+            document
+              .getElementById("confirm_password")
+              .classList.add("is-invalid");
+            document.getElementById("passwordMismatch").style.display = "block";
+            return false;
+          }
+
+          let strength = 0;
+          if (password.length >= 8) strength++;
+          if (/[a-z]/.test(password)) strength++;
+          if (/[A-Z]/.test(password)) strength++;
+          if (/[0-9]/.test(password)) strength++;
+          if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+          if (strength < 4) {
+            e.preventDefault();
+            alert(
+              "Please create a stronger password with at least 8 characters including uppercase, lowercase, number, and special character."
+            );
+            return false;
+          }
+        });
+    </script>
+  </body>
+</html>

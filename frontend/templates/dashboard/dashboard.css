@@ -1,0 +1,62 @@
+/* Dashboard-specific styles */
+
+.card.bg-gradient-primary {
+	background: linear-gradient(120deg, #0d6efd 0%, #5b9df9 100%) !important;
+	color: #fff !important;
+	border: none;
+}
+
+.card.bg-success {
+	background: linear-gradient(120deg, #198754 0%, #43e97b 100%) !important;
+	color: #fff !important;
+	border: none;
+}
+
+.card.bg-warning {
+	background: linear-gradient(120deg, #ffc107 0%, #ffe082 100%) !important;
+	color: #222 !important;
+	border: none;
+}
+
+.card.bg-info {
+	background: linear-gradient(120deg, #0dcaf0 0%, #a1c4fd 100%) !important;
+	color: #fff !important;
+	border: none;
+}
+
+.dashboard .card {
+	transition: box-shadow 0.2s, transform 0.2s;
+	border-radius: 1rem;
+}
+.dashboard .card:hover {
+	box-shadow: 0 8px 32px rgba(80, 120, 200, 0.18);
+	transform: translateY(-4px) scale(1.03);
+}
+
+.dashboard .display-4, .dashboard .display-6 {
+	font-size: 2.5rem;
+	font-weight: 700;
+}
+
+.dashboard .card-title { 
+	font-size: 1.3rem;
+	font-weight: 600;
+}
+
+.dashboard .btn {
+	border-radius: 0.7rem;
+	font-weight: 500;
+	font-size: 1.05rem;
+	padding: 0.6rem 1.2rem;
+}
+
+@media (max-width: 767px) {
+	.dashboard .card {
+		margin-bottom: 1.2rem;
+	}
+	.dashboard .display-4, .dashboard .display-6 {
+		font-size: 2rem;
+	}
+}
+/* dashboard.css - Extends common style.css theme */
+/* Add only dashboard-specific overrides below */

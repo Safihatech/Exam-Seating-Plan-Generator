@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seating Plan</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <style>
+      body {
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: #1a237e;
+        font-size: 2.5em;
+        text-align: center;
+        margin-bottom: 30px;
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .summary-section {
+        display: none;
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-left: 5px solid #28a745;
+      }
+
+      .summary-title {
+        color: #28a745;
+        font-size: 1.4em;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 4fr));
+        gap: 15px;
+      }
+
+      .stat-item {
+        text-align: center;
+        padding: 15px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+      }
+
+      .stat-number {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #28a745;
+        margin-bottom: 5px;
+      }
+
+      .stat-number.danger {
+        color: #dc3545;
+      }
+
+      .stat-label {
+        font-size: 0.9em;
+        color: #6c757d;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #007bff 60%, #00c6ff 100%);
+        color: white;
+      }
+
+      .btn-success {
+        background: linear-gradient(90deg, #28a745 60%, #00c851 100%);
+        color: white;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .room-card {
+        background: #fff;
+        border-radius: 16px;
+        margin: 30px 0;
+        padding: 30px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-top: 6px solid #007bff;
+      }
+
+      .room-title {
+        font-size: 2em;
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .room-info {
+        background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+        padding: 12px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #37474f;
+        border: 1px solid #e1f5fe;
+      }
+
+      .seating-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 0 auto;
+      }
+
+      .seating-table td {
+        padding: 4px;
+        text-align: center;
+      }
+
+      .seat-card {
+        background: linear-gradient(135deg, #e9ecef 60%, #f7fafc 100%);
+        border-radius: 8px;
+        padding: 12px 8px;
+        min-width: 120px;
+        min-height: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        font-size: 13px;
+        color: #222;
+        border: 1px solid #d0d7de;
+        transition: all 0.2s ease;
+      }
+
+      .seat-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+      }
+
+      .seat-card.empty {
+        background: linear-gradient(135deg, #f8d7da 60%, #fff0f3 100%);
+        color: #a94442;
+        font-style: italic;
+        border: 2px dashed #f5c6cb;
+      }
+
+      .student-info {
+        margin-bottom: 4px;
+        width: 100%;
+      }
+
+      .student-info:last-child {
+        margin-bottom: 0;
+      }
+
+      .roll-number {
+        font-weight: bold;
+        color: #1a237e;
+        font-size: 1em;
+        margin-bottom: 2px;
+      }
+
+      .student-name {
+        font-size: 0.85em;
+        color: #495057;
+        margin-bottom: 2px;
+      }
+
+      .student-branch {
+        font-size: 0.75em;
+        color: #6c757d;
+        background: rgba(108, 117, 125, 0.1);
+        padding: 2px 6px;
+        border-radius: 10px;
+        display: inline-block;
+      }
+
+      .student-year {
+        font-size: 0.75em;
+        color: #495057;
+        margin-top: 2px;
+      }
+
+      .unseated-section {
+        background: #fff;
+        border-radius: 16px;
+        padding: 30px;
+        margin: 30px 0;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        border-top: 6px solid #dc3545;
+      }
+
+      .unseated-title {
+        font-size: 1.6em;
+        color: #dc3545;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 600;
+      }
+
+      .unseated-count {
+        background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 1.1em;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 25px;
+      }
+
+      .unseated-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 15px;
+      }
+
+      .unseated-student {
+        background: linear-gradient(135deg, #f8d7da 60%, #fff0f3 100%);
+        border: 1px solid #f5c6cb;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.2s ease;
+      }
+
+      .unseated-student:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+      }
+
+      .unseated-student .roll-number {
+        color: #721c24;
+        font-size: 1.1em;
+        margin-bottom: 5px;
+      }
+
+      .unseated-student .student-name {
+        color: #721c24;
+        font-size: 1em;
+        margin: 5px 0;
+      }
+
+      .unseated-student .student-branch {
+        color: #a94442;
+        background: rgba(169, 68, 66, 0.1);
+        font-size: 0.9em;
+        padding: 4px 8px;
+        border-radius: 12px;
+        margin-top: 5px;
+      }
+
+      .constraint-info {
+        background: linear-gradient(135deg, #e8f4fd 0%, #f3e5f5 100%);
+        border: 1px solid #bee5eb;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: center;
+        color: #0c5460;
+      }
+
+      .legend {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin: 30px auto;
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        max-width: 400px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .legend-color {
+        width: 25px;
+        height: 25px;
+        border-radius: 6px;
+      }
+
+      .legend-color.occupied {
+        background: linear-gradient(135deg, #e9ecef 60%, #f7fafc 100%);
+        border: 1px solid #d0d7de;
+      }
+
+      .legend-color.empty {
+        background: linear-gradient(135deg, #f8d7da 60%, #fff0f3 100%);
+        border: 2px dashed #f5c6cb;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+
+        .button-group {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+
+        .seat-card {
+          min-width: 100px;
+          min-height: 70px;
+          font-size: 11px;
+          padding: 8px 6px;
+        }
+
+        .unseated-grid {
+          grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div style="position: fixed; top: 20px; right: 20px; z-index: 9999">
+        {% for message in messages %}
+        <div
+          style="
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+          "
+        >
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {% endwith %}
+
+      <h1>Exam Seating Plan Generator</h1>
+
+      <div class="constraint-info">
+        <strong>Branch Separation Applied:</strong>
+        Students from the same branch/department are distributed with maximum
+        possible separation
+      </div>
+
+      {% if seating_plan %}
+      <!-- Summary Statistics -->
+      <div class="summary-section">
+        <div class="summary-title">Seating Plan Summary</div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number">{{ seating_plan|length }}</div>
+            <div class="stat-label">Rooms Used</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">
+              {% set total_seated = 0 %} {% for room in seating_plan %} {% set
+              total_seated = total_seated + room.students_count %} {% endfor %}
+              {{ total_seated }}
+            </div>
+            <div class="stat-label">Students Seated</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">
+              {% set total_capacity = 0 %} {% for room in seating_plan %} {% set
+              total_capacity = total_capacity + room.capacity %} {% endfor %} {{
+              total_capacity }}
+            </div>
+            <div class="stat-label">Total Capacity</div>
+          </div>
+          <div class="stat-item">
+            <div
+              class="stat-number {% if unseated_students %}danger{% endif %}"
+            >
+              {{ unseated_students|length if unseated_students else 0 }}
+            </div>
+            <div class="stat-label">Unseated Students</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <a href="{{ url_for('download_pdf') }}" class="btn btn-primary">
+          Download PDF
+        </a>
+        <form
+          method="POST"
+          action="{{ url_for('pdf_history') }}"
+          style="display: inline"
+        >
+          <input type="hidden" name="recipient_type" value="faculty" />
+          <button type="submit" class="btn btn-success">View History</button>
+        </form>
+      </div>
+
+      <!-- Legend -->
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color occupied"></div>
+          <span>Occupied Seat</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color empty"></div>
+          <span>Empty Seat</span>
+        </div>
+      </div>
+
+      <!-- Seating Plan -->
+      {% if seating_plan %} {% for room in seating_plan %}
+      <div class="room-card">
+        <div class="room-title">
+          Room {{ room.room_name or room.room_number or 'Unknown' }}
+        </div>
+
+        <div class="room-info">
+          {% if room.building != 'Main Building' %} Building: {{ room.building
+          }} | {% endif %} Capacity: {{ room.capacity }} | Students: {{
+          room.students_count }} | Utilization: {{
+          "%.1f"|format((room.students_count / room.capacity * 100) if
+          room.capacity > 0 else 0) }}%
+        </div>
+
+        <table class="seating-table">
+          {% for row in room.seats %}
+          <tr>
+            {% for seat in row %}
+            <td>
+              <div class="seat-card {% if not seat %}empty{% endif %}">
+                {% if seat %} {% if seat is mapping %}
+                <!-- Single student -->
+                <div class="student-info">
+                  <div class="roll-number">{{ seat.roll_number }}</div>
+                  <div class="student-name">{{ seat.name }}</div>
+                  <div class="student-branch">{{ seat.branch }}</div>
+                  <div class="student-year">Year: {{ seat.year }}</div>
+                </div>
+                {% elif seat is iterable %}
+                <!-- Multiple students -->
+                {% for student in seat %}
+                <div class="student-info">
+                  <div class="roll-number">{{ student.roll_number }}</div>
+                  <div class="student-name">{{ student.name }}</div>
+                  <div class="student-branch">{{ student.branch }}</div>
+                  <div class="student-year">Year: {{ student.year }}</div>
+                </div>
+                {% endfor %} {% endif %} {% else %} Empty {% endif %}
+              </div>
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% endfor %} {% else %}
+      <div style="text-align: center; margin: 50px 0; color: #6c757d">
+        <h3>No Seating Plan Generated</h3>
+        <p>Please upload CSV files and generate a seating plan.</p>
+      </div>
+      {% endif %}
+
+      <!-- Unseated Students -->
+      {% if unseated_students %}
+      <div class="unseated-section">
+        <div class="unseated-title">Unseated Students</div>
+
+        <div class="unseated-count">
+          {{ unseated_students|length }} student{{ 's' if
+          unseated_students|length != 1 else '' }} could not be seated
+        </div>
+
+        <div class="unseated-grid">
+          {% for student in unseated_students %}
+          <div class="unseated-student">
+            <div class="roll-number">{{ student.roll_number }}</div>
+            <div class="student-name">{{ student.name }}</div>
+            <div class="student-branch">{{ student.branch }}</div>
+            <div class="student-year">Year: {{ student.year }}</div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="constraint-info" style="margin-top: 20px">
+          <strong>Solutions:</strong>
+          Add more rooms, allow multiple students per desk, or review capacity
+          constraints.
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - Exam Seating Plan Generator</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/settings/settings.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+          <i class="fas fa-chair"></i> Exam Seating Plan Generator
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('dashboard') }}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('generate_plan') }}">
+                <i class="fas fa-plus"></i> Generate Plan
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('pdf_history') }}">
+                <i class="fas fa-history"></i> History
+              </a>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle active"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-user"></i> {{ session.full_name }}
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a
+                    class="dropdown-item active"
+                    href="{{ url_for('settings') }}"
+                  >
+                    <i class="fas fa-cog"></i> Settings
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages() %} {% if messages %} {% for
+      message in messages %}
+      <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+              <h3 class="mb-0" style="color: white">
+                <i class="fas fa-cog"></i> Profile & Security
+              </h3>
+            </div>
+            <div class="card-body">
+              <!-- Settings Navigation -->
+              <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                <!-- <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">
+                                    <i class="fas fa-user"></i> Profile & Security
+                                </button>
+                            </li> -->
+                <!-- {% if user_role == 'admin' %}
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="system-tab" data-bs-toggle="tab" data-bs-target="#system" type="button" role="tab">
+                                    <i class="fas fa-server"></i> System Settings
+                                </button>
+                            </li>
+                            {% endif %} -->
+                <!-- <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="preferences-tab" data-bs-toggle="tab" data-bs-target="#preferences" type="button" role="tab">
+                                    <i class="fas fa-sliders-h"></i> Preferences
+                                </button>
+                            </li> -->
+              </ul>
+
+              <div class="tab-content mt-4" id="settingsTabContent">
+                <!-- Profile & Security Tab -->
+                <div
+                  class="tab-pane fade show active"
+                  id="profile"
+                  role="tabpanel"
+                >
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="card mb-3">
+                        <div class="card-header">
+                          <h5 class="mb-0">
+                            <i class="fas fa-user-circle"></i> Profile
+                            Information
+                          </h5>
+                        </div>
+                        <div class="card-body">
+                          <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              value="{{ session.username }}"
+                              readonly
+                            />
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              value="{{ session.full_name }}"
+                              readonly
+                            />
+                          </div>
+                          <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <input
+                              type="text"
+                              class="form-control"
+                              value="{{ session.role.title() }}"
+                              readonly
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card">
+                        <div class="card-header">
+                          <h5 class="mb-0">
+                            <i class="fas fa-lock"></i> Change Password
+                          </h5>
+                        </div>
+                        <div class="card-body">
+                          <form method="POST">
+                            <input
+                              type="hidden"
+                              name="action"
+                              value="change_password"
+                            />
+                            <div class="mb-3">
+                              <label for="old_password" class="form-label"
+                                >Current Password</label
+                              >
+                              <input
+                                type="password"
+                                class="form-control"
+                                id="old_password"
+                                name="old_password"
+                                required
+                              />
+                            </div>
+                            <div class="mb-3">
+                              <label for="new_password" class="form-label"
+                                >New Password</label
+                              >
+                              <input
+                                type="password"
+                                class="form-control"
+                                id="new_password"
+                                name="new_password"
+                                required
+                              />
+                            </div>
+                            <div class="mb-3">
+                              <label for="confirm_password" class="form-label"
+                                >Confirm New Password</label
+                              >
+                              <input
+                                type="password"
+                                class="form-control"
+                                id="confirm_password"
+                                name="confirm_password"
+                                required
+                              />
+                            </div>
+                            <button type="submit" class="btn btn-warning">
+                              <i class="fas fa-key"></i> Change Password
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- System Settings Tab (Admin Only) -->
+                <!-- {% if user_role == 'admin' %}
+                            <div class="tab-pane fade" id="system" role="tabpanel">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-server"></i> System Configuration
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="POST">
+                                            <input type="hidden" name="action" value="update_system_settings">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="students_per_desk" class="form-label">Default Students per Desk</label>
+                                                        <select class="form-select" name="students_per_desk">
+                                                            <option value="1" {% if current_settings.students_per_desk == '1' %}selected{% endif %}>1 Student</option>
+                                                            <option value="2" {% if current_settings.students_per_desk == '2' %}selected{% endif %}>2 Students</option>
+                                                            <option value="3" {% if current_settings.students_per_desk == '3' %}selected{% endif %}>3 Students</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="default_building" class="form-label">Default Building</label>
+                                                        <input type="text" class="form-control" name="default_building" 
+                                                               value="{{ current_settings.default_building or 'Main Building' }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="password_min_length" class="form-label">Minimum Password Length</label>
+                                                        <input type="number" class="form-control" name="password_min_length" 
+                                                               value="{{ current_settings.password_min_length or '6' }}" min="4" max="20">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="session_timeout" class="form-label">Session Timeout (seconds)</label>
+                                                        <input type="number" class="form-control" name="session_timeout" 
+                                                               value="{{ current_settings.session_timeout or '3600' }}">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label for="max_login_attempts" class="form-label">Max Login Attempts</label>
+                                                        <input type="number" class="form-control" name="max_login_attempts" 
+                                                               value="{{ current_settings.max_login_attempts or '5' }}" min="3" max="10">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="pdf_retention_days" class="form-label">PDF Retention (days)</label>
+                                                        <input type="number" class="form-control" name="pdf_retention_days" 
+                                                               value="{{ current_settings.pdf_retention_days or '30' }}">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="include_detained" value="true"
+                                                                   {% if current_settings.include_detained == 'true' %}checked{% endif %}>
+                                                            <label class="form-check-label">Include Detained Students by Default</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="email_notifications" value="true"
+                                                                   {% if current_settings.email_notifications == 'true' %}checked{% endif %}>
+                                                            <label class="form-check-label">Enable Email Notifications</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fas fa-save"></i> Save System Settings
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %} -->
+
+                <!-- Preferences Tab -->
+                <!-- <div class="tab-pane fade" id="preferences" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-paint-brush"></i> Display Preferences
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Theme</label>
+                                                    <select class="form-select">
+                                                        <option selected>Light Theme</option>
+                                                        <option>Dark Theme</option>
+                                                        <option>Auto (System)</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Language</label>
+                                                    <select class="form-select">
+                                                        <option selected>English</option>
+                                                        <option>Spanish</option>
+                                                        <option>French</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-bell"></i> Notification Preferences
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="email_notifications" checked>
+                                                    <label class="form-check-label" for="email_notifications">
+                                                        Email Notifications
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="pdf_ready_notifications" checked>
+                                                    <label class="form-check-label" for="pdf_ready_notifications">
+                                                        PDF Ready Notifications
+                                                    </label>
+                                                </div>
+                                                <div class="form-check mb-3">
+                                                    <input class="form-check-input" type="checkbox" id="system_alerts">
+                                                    <label class="form-check-label" for="system_alerts">
+                                                        System Alerts
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div> -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Account Security Information -->
+          <!-- <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shield-alt"></i> Security Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="display-6 text-success mb-2">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h6>Account Secure</h6>
+                                    <small class="text-muted">Your account is protected</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="display-6 text-info mb-2">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <h6>Session Active</h6>
+                                    <small class="text-muted">Auto-logout in 1 hour of inactivity</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center">
+                                    <div class="display-6 text-warning mb-2">
+                                        <i class="fas fa-key"></i>
+                                    </div>
+                                    <h6>Password Strength</h6>
+                                    <small class="text-muted">Change regularly for security</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Password confirmation validation
+      document
+        .getElementById("confirm_password")
+        .addEventListener("input", function () {
+          const newPassword = document.getElementById("new_password").value;
+          const confirmPassword = this.value;
+
+          if (newPassword !== confirmPassword) {
+            this.setCustomValidity("Passwords do not match");
+          } else {
+            this.setCustomValidity("");
+          }
+        });
+    </script>
+  </body>
+</html>
